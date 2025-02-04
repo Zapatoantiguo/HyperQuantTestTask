@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BitfinexTests.Model
+namespace HyperQuantTestTask.BitfinexLib.Model
 {
     public class Ticker
     {
