@@ -120,7 +120,6 @@ namespace HyperQuantTestTask.BitfinexLib
             {
                 _sendSemaphore.Release();
             }
-
         }
 
         public async Task SubscribeTrades(string pair)
@@ -196,13 +195,9 @@ namespace HyperQuantTestTask.BitfinexLib
         {
             using (var reader = new StreamReader(inputStream, encoding: Encoding.UTF8, true))
             {
-                //Console.WriteLine("------------ MESSAGE -----------------");
-                //Console.WriteLine(reader.ReadToEnd());
                 ParseMessage(reader);
             }
         }
-
-
 
         // TODO: познакомиться с протоколом Bitfinex (форматы событий и данных и пр.) поближе и переписать это месиво ниже по уму
         private void ParseMessage(StreamReader reader)
@@ -213,8 +208,6 @@ namespace HyperQuantTestTask.BitfinexLib
                 string json = firstChar.ToString() + reader.ReadToEnd();
                 var dictionary = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
                 string eventType = dictionary["event"].ToString();
-
-                Console.WriteLine($"======================= EVENT: {eventType} ==========================");
 
                 switch (eventType)
                 {
@@ -229,7 +222,6 @@ namespace HyperQuantTestTask.BitfinexLib
                                 string symbol = dictionary["symbol"].ToString();
                                 channelObj = new TradesChannelObject(id, symbol) { LastHeartbeatTimestamp = DateTimeOffset.UtcNow };
                                 _channels.Add(id, channelObj);
-                                Console.WriteLine();
                             }
 
                             else if (channel == CandlesChannelObject.ChannelLiteral)
@@ -237,7 +229,6 @@ namespace HyperQuantTestTask.BitfinexLib
                                 string key = dictionary["key"].ToString();
                                 channelObj = new CandlesChannelObject(id, key) { LastHeartbeatTimestamp = DateTimeOffset.UtcNow };
                                 _channels.Add(id, channelObj);
-                                Console.WriteLine();
                             }
                             break;
                         }
@@ -272,28 +263,27 @@ namespace HyperQuantTestTask.BitfinexLib
                     _channels[id].LastHeartbeatTimestamp = DateTimeOffset.UtcNow;
                     return;
                 }
+                TradeEventType newTradeType = TradeEventType.Update;
+                if (full.Contains("te"))
+                {
+                    newTradeType = TradeEventType.Executed;
+                    full = full.Remove(0, 5);
+                }
+                else if (full.Contains("tu"))
+                {
+                    newTradeType = TradeEventType.Update;
+                    full = full.Remove(0, 5);
+                }
 
                 full = full.Remove(full.Length - 1);    // удаление закрывающего символа ], парного уже считанному [
                 byte[] jsonBytes = Encoding.UTF8.GetBytes(full);
                 Utf8JsonReader jsonReader = new Utf8JsonReader(jsonBytes);
 
-                jsonReader.Read();
+                if (full.Contains("[["))
+                    jsonReader.Read();
+
                 if (_channels[id] is TradesChannelObject to)
                 {
-                    TradeEventType newTradeType = TradeEventType.Update;
-                    if (full.Contains("te"))
-                    {
-                        newTradeType = TradeEventType.Executed;
-                        jsonReader.Skip();
-                        //jsonReader.Read();  // пропуск "te"
-                    }
-                    else if (full.Contains("tu"))
-                    {
-                        newTradeType = TradeEventType.Update;
-                        jsonReader.Skip();
-                        //jsonReader.Read();  // пропуск "te"
-                    }
-
                     var converter = new TradesDtoJsonConverter();
                     var dtos = converter.Read(ref jsonReader, typeof(List<TradeDto>), new JsonSerializerOptions());
                     List<Trade> trades = dtos.Select(dto => dto.ToEntity(to.TradingPair)).ToList();
@@ -314,9 +304,6 @@ namespace HyperQuantTestTask.BitfinexLib
 
                 else if (_channels[id] is CandlesChannelObject co)
                 {
-                    //if (full.Contains("[["))
-                    //    jsonReader.Read();
-
                     var converter = new CandlesDtoJsonConverter();
                     var dtos = converter.Read(ref jsonReader, typeof(List<CandleDto>), new JsonSerializerOptions());
                     List<Candle> candles = dtos.Select(dto => dto.ToEntity(co.TradingPair)).ToList();
@@ -332,7 +319,7 @@ namespace HyperQuantTestTask.BitfinexLib
                         CandleSnapshotEventArgs eventArgs = new() { Snapshot = candles };
                         OnCandleSnapshotReceived?.Invoke(this, eventArgs);
                         return;
-                    }  
+                    }
                 }
             }
         }
