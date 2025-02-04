@@ -15,27 +15,23 @@ namespace HyperQuantTestTask.BitfinexLib.Converters
 
             while (reader.Read())
             {
-                switch (reader.TokenType)
+                if (reader.TokenType == JsonTokenType.StartArray)
                 {
-                    case JsonTokenType.StartArray:
-                        {
-                            currentCandle = new CandleDto();
-                            reader.Read();  // Millisecond epoch timestamp
-                            currentCandle.Timestamp = reader.GetInt64();
-                            reader.Read();  // 	First execution during the time frame
-                            currentCandle.OpenPrice = reader.GetInt64();
-                            reader.Read();  // Last execution during the time frame
-                            currentCandle.ClosePrice = reader.GetInt64();
-                            reader.Read();  // Highest execution during the time frame
-                            currentCandle.HighPrice = reader.GetInt64();
-                            reader.Read();  // Lowest execution during the timeframe
-                            currentCandle.LowPrice = reader.GetInt64();
-                            reader.Read();  // Quantity of symbol traded within the timeframe
-                            currentCandle.Volume = reader.GetDecimal();
+                    currentCandle = new CandleDto();
+                    reader.Read();  // Millisecond epoch timestamp
+                    currentCandle.Timestamp = reader.GetInt64();
+                    reader.Read();  // 	First execution during the time frame
+                    currentCandle.OpenPrice = reader.GetInt64();
+                    reader.Read();  // Last execution during the time frame
+                    currentCandle.ClosePrice = reader.GetInt64();
+                    reader.Read();  // Highest execution during the time frame
+                    currentCandle.HighPrice = reader.GetInt64();
+                    reader.Read();  // Lowest execution during the timeframe
+                    currentCandle.LowPrice = reader.GetInt64();
+                    reader.Read();  // Quantity of symbol traded within the timeframe
+                    currentCandle.Volume = reader.GetDecimal();
 
-                            result.Add(currentCandle);
-                            break;
-                        }
+                    result.Add(currentCandle);
                 }
             }
 

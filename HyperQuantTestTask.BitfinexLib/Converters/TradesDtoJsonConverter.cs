@@ -1,11 +1,6 @@
 ﻿using HyperQuantTestTask.BitfinexLib.Dto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace HyperQuantTestTask.BitfinexLib.Converters
 {
@@ -19,24 +14,20 @@ namespace HyperQuantTestTask.BitfinexLib.Converters
 
             while (reader.Read())
             {
-                switch (reader.TokenType)
+                if (reader.TokenType == JsonTokenType.StartArray)
                 {
-                    case JsonTokenType.StartArray:
-                        {
-                            currentTrade = new TradeDto();
+                    currentTrade = new TradeDto();
 
-                            reader.Read();  // ID of the trade
-                            currentTrade.Id = reader.GetInt64();
-                            reader.Read();  // Millisecond epoch timestamp
-                            currentTrade.Timestamp = reader.GetInt64();
-                            reader.Read();  // How much was bought (positive) or sold (negative)
-                            currentTrade.Amount = reader.GetDecimal();
-                            reader.Read();  // Price at which the trade was executed
-                            currentTrade.Price = reader.GetDecimal();
+                    reader.Read();  // ID of the trade
+                    currentTrade.Id = reader.GetInt64();
+                    reader.Read();  // Millisecond epoch timestamp
+                    currentTrade.Timestamp = reader.GetInt64();
+                    reader.Read();  // How much was bought (positive) or sold (negative)
+                    currentTrade.Amount = reader.GetDecimal();
+                    reader.Read();  // Price at which the trade was executed
+                    currentTrade.Price = reader.GetDecimal();
 
-                            result.Add(currentTrade);
-                            break;
-                        }
+                    result.Add(currentTrade);
                 }
             }
 
