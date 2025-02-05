@@ -12,6 +12,11 @@ namespace HyperQuantTestTask.BitfinexLib
         {
             _restClient = restClient;
             _wsClient = wsClient;
+            ConnectEvents();
+
+            // Управление коннектами и реконнектами для веб-сокета отдельная тема, которую нужно тщательно продумать
+            // Здесь, в тестовом задании, используется топорный блокирующий вызов подключения в конструкторе
+            _wsClient.ConnectAsync().Wait();
         }
 
         public event Action<Trade> NewBuyTrade;
@@ -57,6 +62,27 @@ namespace HyperQuantTestTask.BitfinexLib
             await _wsClient.UnsubscribeTradesAsync(pair);
         }
 
+        public async void RebootSocket()
+        {
+            await _wsClient.DisconnectAsync();
+            await _wsClient.ConnectAsync();
+        }
+
+        private void ConnectEvents()
+        {
+            _wsClient.OnTradeReceived += (_, args) =>
+            {
+                var trade = args.Trade;
+                if (trade.Side == "buy") NewBuyTrade?.Invoke(trade);
+                else if (trade.Side == "sell") NewSellTrade?.Invoke(trade);
+            };
+
+            _wsClient.OnCandleReceived += (_, args) =>
+            {
+                var candle = args.Candle;
+                CandleSeriesProcessing?.Invoke(candle);
+            };
+        }
         
     }
 }

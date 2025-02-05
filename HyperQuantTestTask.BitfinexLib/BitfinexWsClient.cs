@@ -16,12 +16,13 @@ namespace HyperQuantTestTask.BitfinexLib
 {
     public class BitfinexWsClient : IDisposable
     {
+        private readonly string _url = "wss://api-pub.bitfinex.com/ws/2";
+
         private ClientWebSocket _client;
         private CancellationTokenSource _cts;
         private SemaphoreSlim _sendSemaphore;
 
         private Dictionary<long, ChannelObject> _channels = new();
-
 
         public int ReceiveBufferSize { get; set; } = 8192;
         public WebSocketState? SocketState { get => _client?.State; }
@@ -32,7 +33,7 @@ namespace HyperQuantTestTask.BitfinexLib
         public event EventHandler<CandleNotificationEventArgs> OnCandleReceived;
         public List<ChannelObject> GetActiveChannels() => _channels.Select(kvp => kvp.Value).ToList();
 
-        public async Task ConnectAsync(string url)
+        public async Task ConnectAsync()
         {
             if (_client != null)
             {
@@ -47,7 +48,7 @@ namespace HyperQuantTestTask.BitfinexLib
             _cts = new CancellationTokenSource();
             _sendSemaphore = new SemaphoreSlim(1, 1);
 
-            await _client.ConnectAsync(new Uri(url), _cts.Token);
+            await _client.ConnectAsync(new Uri(_url), _cts.Token);
             await Task.Factory.StartNew(ReceiveLoop, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
