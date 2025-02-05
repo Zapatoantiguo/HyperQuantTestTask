@@ -179,9 +179,10 @@ namespace HyperQuantTestTask.BitfinexLib
             long? chanId = _channels.Values.SingleOrDefault(ch => ch is CandlesChannelObject tco && tco.TradingPair == pair)?.Id;
 
             if (chanId == null)
-                throw new QueryParamsValidationException($"Отсутствует подписка на канал свечей с символом: {pair}. Отписка невозможна.");
+                //    throw new QueryParamsValidationException($"Отсутствует подписка на канал свечей с символом: {pair}. Отписка невозможна.");
+                return;
 
-            if (_client.State != WebSocketState.Open)
+                if (_client.State != WebSocketState.Open)
                 throw new InvalidOperationException("Попытка взаимодействия с сервером при отсутствии Websocket-подключения");
 
             UnsubscribeRequest request = new() { ChanId = chanId.Value };

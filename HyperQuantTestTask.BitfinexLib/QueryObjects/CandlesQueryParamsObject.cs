@@ -40,7 +40,7 @@ namespace HyperQuantTestTask.BitfinexLib.QueryObjects
             if (!IsValid())
                 throw new QueryParamsValidationException("Некорректные параметры запроса свечей");
 
-            string candleParam = new CandleSetting() { TradingPair = TradingPair }.ToString();
+            string candleParam = new CandleSetting() { TradingPair = TradingPair, TimeFrame = TimeFrame }.ToString();
 
             string startTsStr = StartTimestamp == 0 ? string.Empty : StartTimestamp.ToString();
             string endTsStr = EndTimestamp == 0 ? string.Empty : EndTimestamp.ToString();
@@ -56,7 +56,7 @@ namespace HyperQuantTestTask.BitfinexLib.QueryObjects
 
             return SymbolValidator.IsValidTradingPair(TradingPair) &&
                 timestampsAreCorrect &&
-                Limit > 0 && Limit < maxResponseRecords;
+                Limit > 0 && Limit <= maxResponseRecords;
         }
     }
 }

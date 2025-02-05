@@ -37,7 +37,7 @@ namespace HyperQuantTestTask.BitfinexLib.Model
         /// Partial (Общая сумма сделок)
         /// </summary>
         /// <remarks>
-        /// Неясно, что это за поле, возможно, опечатка в задаче. Пока возвращает -1
+        /// Неясно, что это за поле, возможно, опечатка в задаче (разве не Volume - общая сумма?). Пока возвращает -1
         /// </remarks>
         public decimal TotalPrice { get => -1; }
 

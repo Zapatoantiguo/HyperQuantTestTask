@@ -49,7 +49,7 @@ namespace HyperQuantTestTask.BitfinexLib
 
         /// <remarks>
         /// Websocket API при уведомлении о сделке указывает тип операции: executed / updated. Из имен события неясно,
-        /// нужны ли оба или только один. В текущей реализации операции обоих типов вызывают событие
+        /// нужны ли оба или только один. В текущей реализации я беру только executed (см. ConnectEvents()) коннектора
         /// </remarks>
         event Action<Trade> NewSellTrade;
 

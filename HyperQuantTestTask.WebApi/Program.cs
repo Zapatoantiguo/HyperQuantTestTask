@@ -1,5 +1,6 @@
 using HyperQuantTestTask.BitfinexLib;
 using HyperQuantTestTask.WebApi;
+using System;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
@@ -23,9 +24,13 @@ builder.Services.AddHttpClient();
 builder.Services.AddSingleton<BitfinexRestApiClient>();
 builder.Services.AddSingleton<BitfinexWsClient>();
 builder.Services.AddSingleton<ITestConnector, TestConnector>();
+
 builder.Services.AddSingleton<WebsocketDataLogger>();
 
 var app = builder.Build();
+
+var eventLogger = app.Services.GetRequiredService<WebsocketDataLogger>();
+eventLogger.SubscribeConsoleToConnectorEvents();
 
 app.UseSwagger();
 app.UseSwaggerUI();

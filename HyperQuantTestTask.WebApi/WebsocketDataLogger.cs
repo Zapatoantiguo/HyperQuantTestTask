@@ -12,7 +12,10 @@ namespace HyperQuantTestTask.WebApi
         {
             _logger = logger;
             _connector = connector;
+        }
 
+        public void SubscribeConsoleToConnectorEvents()
+        {
             _connector.NewBuyTrade += trade =>
             {
                 _logger.LogInformation($"New buy trade. Id: {trade.Id}, Symbol: {trade.Pair}, Timestamp: {trade.Time}," +
@@ -29,9 +32,11 @@ namespace HyperQuantTestTask.WebApi
             {
                 _logger.LogInformation($"New candle data. Symbol: {candle.Pair}, OpnTime: {candle.OpenTime}," +
                 $" LPrice: {candle.LowPrice}, HPrice: {candle.HighPrice}, OpenPrice: {candle.OpenPrice}, " +
-                $" TotalPrice: {candle.TotalPrice}");
+                $" Volume: {candle.TotalVolume}");
             };
         }
+
+
 
         public class DummyLog
         {

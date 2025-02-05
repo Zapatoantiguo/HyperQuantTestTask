@@ -32,7 +32,7 @@ namespace HyperQuantTestTask.BitfinexLib
         public async Task<IEnumerable<Candle>> GetCandleSeriesAsync(string pair, BitfinexTimeFrame timeFrame, 
             DateTimeOffset? from, DateTimeOffset? to = null, int count = 100)
         {
-            var result = await _restClient.GetCandlesAsync(pair, count, start: from, end: to);
+            var result = await _restClient.GetCandlesAsync(pair, count, timeFrame: timeFrame, start: from, end: to);
             return result;
         }
 
@@ -73,6 +73,7 @@ namespace HyperQuantTestTask.BitfinexLib
             _wsClient.OnTradeReceived += (_, args) =>
             {
                 var trade = args.Trade;
+                if (args.Type == TradeEventType.Update) return;
                 if (trade.Side == "buy") NewBuyTrade?.Invoke(trade);
                 else if (trade.Side == "sell") NewSellTrade?.Invoke(trade);
             };
