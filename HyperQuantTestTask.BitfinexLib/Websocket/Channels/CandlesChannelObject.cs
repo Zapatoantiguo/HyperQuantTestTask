@@ -30,6 +30,9 @@ namespace HyperQuantTestTask.BitfinexLib.Websocket.Channels
             return _candleSetting.ToString();
         }
 
-        
+        public override string GetTradingPair()
+        {
+            return TradingPair;
+        }
     }
 }

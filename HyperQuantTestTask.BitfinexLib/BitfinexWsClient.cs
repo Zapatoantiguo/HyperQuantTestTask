@@ -122,7 +122,7 @@ namespace HyperQuantTestTask.BitfinexLib
             }
         }
 
-        public async Task SubscribeTrades(string pair)
+        public async Task SubscribeTradesAsync(string pair)
         {
             if (!SymbolValidator.IsValidTradingPair(pair))
                 throw new QueryParamsValidationException($"Попытка подписки на трейд с некорректным символом: {pair}");
@@ -139,12 +139,13 @@ namespace HyperQuantTestTask.BitfinexLib
             await SendMessageAsync(json);
         }
 
-        public async Task UnsubscribeTrades(string pair)
+        public async Task UnsubscribeTradesAsync(string pair)
         {
             long? chanId = _channels.Values.SingleOrDefault(ch => ch is TradesChannelObject tco && tco.TradingPair == pair)?.Id;
 
             if (chanId == null)
-                throw new QueryParamsValidationException($"Отсутствует подписка на канал трейдов с символом: {pair}. Отписка невозможна.");
+                //throw new QueryParamsValidationException($"Отсутствует подписка на канал трейдов с символом: {pair}. Отписка невозможна.");
+                return;
 
             if (_client.State != WebSocketState.Open)
                 throw new InvalidOperationException("Попытка взаимодействия с сервером при отсутствии Websocket-подключения");
@@ -158,7 +159,7 @@ namespace HyperQuantTestTask.BitfinexLib
             await SendMessageAsync(json);
         }
 
-        public async Task SubscribeCandles(CandleSetting candleParam)
+        public async Task SubscribeCandlesAsync(CandleSetting candleParam)
         {
             if (_client.State != WebSocketState.Open)
                 throw new InvalidOperationException("Попытка взаимодействия с сервером при отсутствии Websocket-подключения");
@@ -172,7 +173,7 @@ namespace HyperQuantTestTask.BitfinexLib
             await SendMessageAsync(json);
         }
 
-        public async Task UnsubscribeCandles(string pair)
+        public async Task UnsubscribeCandlesAsync(string pair)
         {
             long? chanId = _channels.Values.SingleOrDefault(ch => ch is CandlesChannelObject tco && tco.TradingPair == pair)?.Id;
 

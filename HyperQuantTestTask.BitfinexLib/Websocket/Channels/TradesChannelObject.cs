@@ -25,5 +25,9 @@ namespace HyperQuantTestTask.BitfinexLib.Websocket.Channels
         {
             return TradingPair;
         }
+        public override string GetTradingPair()
+        {
+            return TradingPair;
+        }
     }
 }
